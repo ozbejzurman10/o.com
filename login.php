@@ -37,27 +37,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Login</h1>
+<div class="centered-container">
+    <div class="logo">O</div>
+    <div class="subtitle">Welcome back!</div>
+</div>
 
 <?php if ($error): ?>
     <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
 <?php endif; ?>
 
-<form method="POST">
-    <label>Username:</label><br>
-    <input type="text" name="username"><br><br>
+<div class="centered-container">
+<form class="login_form" method="POST">
+    <label>Username:</label>
+    <input type="text" name="username">
 
-    <label>Password:</label><br>
-    <input type="password" name="password"><br><br>
+    <label>Password:</label>
+    <input type="password" name="password">
 
     <button type="submit">Login</button>
-</form>
 
-<p><a href="index.php">Back to home page</a></p>
-<p><a href="signup.php">Don't have an account? Sign up</a></p>
+    <div>Don’t have an account yet? <a href="signup.php">Sign up</a></div>
+    <div><a href="index.php" style="text-decoration: none;">← Back</a></div>
+
+</form>
+</div>
+
+
 
 </body>
 </html>

@@ -44,14 +44,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Sign Up</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Registracija</h1>
+<div class="centered-container">
+    <div class="logo">O</div>
+    <div class="subtitle">Welcome new user!</div>
+</div>
+
+
+<div class="centered-container">
+<form class="login_form" method="POST">
+    <label>Email:</label>
+    <input type="email" name="email">
+    
+    <label>Username:</label>
+    <input type="text" name="username">
+
+    <label>Password:</label>
+    <input type="password" name="password">
+
+    <button type="submit">Register</button>
+
+    <div>Already have an account? <a href="login.php">Login</a></div>
+    <div><a href="index.php" style="text-decoration: none;">← Back</a></div>
+
+</form>
+</div>
 
 <?php if ($error): ?>
     <p style="color:red;"><?php echo $error; ?></p>
@@ -62,21 +86,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <?php endif; ?>
 
 
-<form method="POST">
-    <label>Uporabniško ime:</label><br>
-    <input type="text" name="username"><br><br>
-
-    <label>Email:</label><br>
-    <input type="email" name="email"><br><br>
-
-    <label>Geslo:</label><br>
-    <input type="password" name="password"><br><br>
-
-    <button type="submit">Registriraj se</button>
-</form>
-
-<p><a href="index.php">Nazaj na začetno stran</a></p>
-    
 
 </body>
 </html>
