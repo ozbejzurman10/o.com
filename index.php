@@ -2,7 +2,7 @@
 session_start();
 require_once "config/db.php";
 
-$stmt = $conn->query("SELECT username, user_role FROM users");
+$stmt = $conn->query("SELECT username, user_role, id FROM users");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -28,14 +28,21 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <ul>
 <?php foreach ($users as $user): ?>
-    <li><?php echo htmlspecialchars($user['username']); ?> <?php echo htmlspecialchars($user['user_role']); ?></li>
+    <li>
+        <?php echo htmlspecialchars($user['username']); ?> 
+        <?php echo htmlspecialchars($user['user_role']); ?>
+
+        <a href="profile.php?id=<?php echo $user['id']; ?>">
+            <?php echo htmlspecialchars($user['username']); ?>
+        </a>
+    </li>
 <?php endforeach; ?>
 </ul>
 
 <a href="signup.php">Sign up!</a>
 <a href="create_post.php">Create a post</a>
 <a href="show_posts.php">Show posts</a>
-<a href="profile_self.php">Profile</a>
+<a href="profile.php">Profile</a>
 
 <?php if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin"): ?>
     <a href="admin_page.php">Admin</a>

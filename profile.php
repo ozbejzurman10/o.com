@@ -4,26 +4,44 @@ require_once "config/db.php";
 
 $error = "";
 
-$post_title = trim($_POST["post_title"] ?? "");
-$post_content = trim($_POST["post_content"] ?? "");
-
-if (!isset($_SESSION["user_id"])) {
-    $error = "You are not logged in!";
+if (isset($_GET['id'])) {
+    $profile_user_id = intval($_GET['id']); // ID uporabnika iz URL
 }
 
 else {
-    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->execute([$_SESSION["user_id"]]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $profile_user_id = $_SESSION['user_id']; // moj profil, če ni ID
+}
 
-    if (!$user) { $error = "User not found!"; }
+if (isset($_SESSION['user_id'])) {
+    $isOwnProfile = ($_SESSION['user_id'] == $profile_user_id);
+}
 
-    else {
-        $user_id = $user["id"];
-        $username = $user["username"];
-        $user_role = $user["user_role"];
-        $user_bio = $user["bio"];
-    }
+else {
+    $isOwnProfile = false;
+    $error = "You must be logged in to do that!";
+}
+
+// Poizvedba za user podatke
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$profile_user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$stmt = $conn->prepare("SELECT COUNT(*) AS followers_count FROM follows WHERE followed_user_id = ?");
+$stmt->execute([$profile_user_id]);
+$followerData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) { $error = "User not found"; }
+
+else {
+    $user_id = $user["id"];
+    $username = $user["username"];
+    $user_role = $user["user_role"];
+    $user_bio = $user["bio"];
+    $followers_count = $followerData['followers_count'];
+
+}
+
+
 
 // profilna slika
 if (isset($_POST['upload_image']) && isset($_FILES['profile_image'])) {
@@ -49,7 +67,7 @@ if (isset($_POST['upload_image']) && isset($_FILES['profile_image'])) {
 
                 // unikaten filename
                 $newName = uniqid("user_pfp", true) . "." . $fileType;
-                $destination = "profile_images/users/" . $newName;
+                $destination = "profile_images/" . $newName;
 
                 if (move_uploaded_file($fileTmp, $destination)) {
 
@@ -71,6 +89,49 @@ if (isset($_POST['upload_image']) && isset($_FILES['profile_image'])) {
     } else { $error = "Invalid file type!"; }
 }
 
+// bio
+if (isset($_POST['update_bio'])) {
+    $new_bio = trim($_POST['new_bio']);
+
+    $stmt = $conn->prepare("UPDATE users SET bio = ? WHERE id = ?");
+    $stmt->execute([$new_bio, $profile_user_id]);
+
+    $user_bio = $new_bio;
+}
+
+// follow unfollow
+if (isset($_POST['follow_unfollow'])) {
+    if (!$isOwnProfile) {
+
+        if (isFollowing($conn, $_SESSION['user_id'], $profile_user_id)) {
+            // unfollow
+            $stmt = $conn->prepare("DELETE FROM follows WHERE following_user_id = ? AND followed_user_id = ?");
+            $stmt->execute([$_SESSION['user_id'], $profile_user_id]);
+        } 
+        
+        else {
+            // follow
+            $stmt = $conn->prepare("INSERT INTO follows (following_user_id, followed_user_id) VALUES (?, ?)");
+            $stmt->execute([$_SESSION['user_id'], $profile_user_id]);
+        }
+
+        // refreshaj stran
+        header("Location: profile.php?id=" . $profile_user_id);
+        exit;
+    }
+}
+
+function isFollowing($conn, $follower_id, $followed_id) {
+    $stmt = $conn->prepare("SELECT followed_user_id FROM follows WHERE following_user_id = ? AND followed_user_id = ?");
+    $stmt->execute([$follower_id, $followed_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        return true;
+    } 
+    else {
+        return false;
+    }
 }
 
 function deleteOldPfp($conn, $user_id) {
@@ -108,23 +169,43 @@ function deleteOldPfp($conn, $user_id) {
     <p><strong>User role:</strong> <?php echo htmlspecialchars($user_role); ?></p>
     <p><strong>User Bio:</strong> <?php echo htmlspecialchars($user_bio); ?></p>
 
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="profile_image">
-        <button type="submit" name="upload_image">Upload</button>
-    </form>
+    <p>Followers: <?php echo htmlspecialchars($followerData['followers_count']); ?></p>
 
-    <?php
-    if (!empty($user['profile_image'])) {
-        $img = $user['profile_image'];
-    } 
-    else {
-        $img = 'default.png';
-    }
-    ?>
+    <?php if ($isOwnProfile): ?>
+        <!-- edit bio -->
+        <form method="POST">
+            <textarea name="new_bio" rows="4" cols="50"><?php echo htmlspecialchars($user_bio); ?></textarea><br>
+            <button type="submit" name="update_bio">Update Bio</button>
+        </form>
 
-    <img src="profile_images/users/<?php echo htmlspecialchars($img); ?>" alt="Avatar" style="width:100px;height:100px;">
-    
+        <!-- pfp -->
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="profile_image">
+            <button type="submit" name="upload_image">Upload</button>
+        </form>
+
+
+    <?php else: ?>
+        <!-- follow -->
+        <form method="POST">
+            <button type="submit" name="follow_unfollow">
+                <?php echo isFollowing($conn, $_SESSION['user_id'], $profile_user_id) ? "Unfollow" : "Follow"; ?>
+            </button>
+        </form>
+    <?php endif; ?>
+
+<?php
+if (!empty($user['profile_image'])) {
+    $img = $user['profile_image'];
+} 
+else { $img = 'default.png'; }
+?>
+
+<img src="profile_images/<?php echo htmlspecialchars($img); ?>" alt="Avatar" style="width:100px;height:100px;">
+
 <?php endif; ?>
+
+
 
 <p><a href="index.php">Nazaj na začetno stran</a></p>
 
