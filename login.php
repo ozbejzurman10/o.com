@@ -46,17 +46,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="subtitle">Welcome back!</div>
 </div>
 
-<?php if ($error): ?>
-    <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
-<?php endif; ?>
-
 <div class="centered-container">
 <form class="login_form" method="POST">
-    <label>Username:</label>
+    <label>Username</label>
     <input type="text" name="username">
 
-    <label>Password:</label>
+    <label>Password</label>
     <input type="password" name="password">
+
+    <?php if ($error): ?>
+        <div style="color:red;"><?php echo $error; ?></div>
+    <?php else: ?>
+        <div> <br> </div>
+    <?php endif; ?>
 
     <button type="submit">Login</button>
 
@@ -65,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </form>
 </div>
-
 
 
 </body>

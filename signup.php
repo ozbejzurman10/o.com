@@ -2,11 +2,11 @@
 require_once "config/db.php";
 
 $error = "";
-$success = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $username = trim($_POST["username"]);
+    $display_name = trim($_POST["display_name"]);
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
@@ -29,12 +29,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             // Vstavi novega uporabnika
             $stmt = $conn->prepare(
-                "INSERT INTO users (username, email, password, user_role)
-                VALUES (?, ?, ?, 'user')"
+                "INSERT INTO users (username, display_name, email, password, user_role)
+                VALUES (?, ?, ?, ?, 'user')"
             );
 
-            if ($stmt->execute([$username, $email, $hashedPassword])) {
-                $success = "Registracija uspešna!";
+            // Uspesna prijava
+            if ($stmt->execute([$username, $display_name, $email, $hashedPassword])) {
+                header("Location: login.php");
             } else {
                 $error = "Napaka pri registraciji.";
             }
@@ -53,21 +54,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
 <div class="centered-container">
-    <div class="logo">O</div>
+    <div class="logo">O</a></div>
     <div class="subtitle">Welcome new user!</div>
 </div>
 
 
 <div class="centered-container">
 <form class="login_form" method="POST">
-    <label>Email:</label>
+    <label>Email</label>
     <input type="email" name="email">
     
-    <label>Username:</label>
+    <label>Username</label>
     <input type="text" name="username">
 
-    <label>Password:</label>
+    <label>Display Name</label>
+    <input type="text" name="display_name">
+
+    <label>Password</label>
     <input type="password" name="password">
+
+    <?php if ($error): ?>
+        <div style="color:red;"><?php echo $error; ?></div>
+    <?php else: ?>
+        <div> <br> </div>
+    <?php endif; ?>
 
     <button type="submit">Register</button>
 
@@ -76,15 +86,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </form>
 </div>
-
-<?php if ($error): ?>
-    <p style="color:red;"><?php echo $error; ?></p>
-<?php endif; ?>
-
-<?php if ($success): ?>
-    <p style="color:green;"><?php echo $success; ?></p>
-<?php endif; ?>
-
 
 
 </body>

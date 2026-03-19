@@ -35,6 +35,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <a href="signup.php">Sign up!</a>
 <a href="create_post.php">Create a post</a>
 <a href="show_posts.php">Show posts</a>
+<a href="profile_self.php">Profile</a>
 
 <?php if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin"): ?>
     <a href="admin_page.php">Admin</a>
