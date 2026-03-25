@@ -13,6 +13,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (empty($username) || empty($email) || empty($password)) {
         $error = "Izpolnite vsa polja!";
     }
+
+    elseif (strlen($display_name) > 32) {
+    $error = "Display name lahko vsebuje največ 32 znakov!";
+    }
+
+    elseif (strlen($username) > 16) {
+    $error = "Username lahko vsebuje največ 16 znakov!";
+    }
+
+    elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+    $error = "Username lahko vsebuje samo črke, številke in _";
+    }
     
     else {
         // Preveri če uporabnik že obstaja
@@ -65,10 +77,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <input type="email" name="email">
     
     <label>Username</label>
-    <input type="text" name="username">
+    <input type="text" name="username" maxlength="16">
 
     <label>Display Name</label>
-    <input type="text" name="display_name">
+    <input type="text" name="display_name" maxlength="32">
 
     <label>Password</label>
     <input type="password" name="password">

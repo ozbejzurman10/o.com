@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // Prijava uspešna
             $_SESSION["user_id"] = $user["id"];
             $_SESSION["username"] = $user["username"];
-            $_SESSION["user_role"] = $user['user_role'];
+            $_SESSION["user_role"] = $user["user_role"];
 
             // Preusmeri na začetno stran
             header("Location: index.php");

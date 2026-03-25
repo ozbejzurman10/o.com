@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "config/db.php";
+require_once "helpers/helpers.php";
 
 $error = "";
 
@@ -38,7 +39,7 @@ else {
     $user_role = $user["user_role"];
     $user_bio = $user["bio"];
     $followers_count = $followerData['followers_count'];
-
+    $display_name = $user["display_name"];
 }
 
 
@@ -140,7 +141,7 @@ function deleteOldPfp($conn, $user_id) {
     $userPfp = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($userPfp && !empty($userPfp['profile_image']) && $userPfp['profile_image'] !== 'default.png') {
-        $oldImage = "profile_images/users/" . $userPfp['profile_image'];
+        $oldImage = "profile_images/" . $userPfp['profile_image'];
         if (file_exists($oldImage)) {
             unlink($oldImage);
         }
@@ -154,9 +155,16 @@ function deleteOldPfp($conn, $user_id) {
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<?php 
+    include 'sidebar.php'; ?>
+
+
+
+<div class="main">
 <h1>Profile</h1>
 
 <?php if ($error): ?>
@@ -165,6 +173,7 @@ function deleteOldPfp($conn, $user_id) {
 
 <?php if (!$error): ?>
     <p><strong>Username:</strong> <?php echo htmlspecialchars($username); ?></p>
+    <p><strong>Display Name:</strong> <?php echo htmlspecialchars($display_name); ?></p>
     <p><strong>User ID:</strong> <?php echo htmlspecialchars($user_id); ?></p>
     <p><strong>User role:</strong> <?php echo htmlspecialchars($user_role); ?></p>
     <p><strong>User Bio:</strong> <?php echo htmlspecialchars($user_bio); ?></p>
@@ -180,7 +189,7 @@ function deleteOldPfp($conn, $user_id) {
 
         <!-- pfp -->
         <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="profile_image">
+            <input type="file" name="profile_image" accept="image/*">
             <button type="submit" name="upload_image">Upload</button>
         </form>
 
@@ -201,13 +210,15 @@ if (!empty($user['profile_image'])) {
 else { $img = 'default.png'; }
 ?>
 
-<img src="profile_images/<?php echo htmlspecialchars($img); ?>" alt="Avatar" style="width:100px;height:100px;">
+<img class="profile-pic" src="profile_images/<?php echo htmlspecialchars($img); ?>" alt="Avatar" style="width:100px;height:100px;">
 
 <?php endif; ?>
 
-
-
 <p><a href="index.php">Nazaj na začetno stran</a></p>
+
+</div>
+
+
 
 </body>
 </html>

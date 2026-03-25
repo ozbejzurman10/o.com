@@ -6,7 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Vrni userja po IDju
 function getUserById(PDO $conn, int $id): ?array
 {
     $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
@@ -20,13 +19,23 @@ function getUserById(PDO $conn, int $id): ?array
     else return null;
 }
 
-// Vrni username po IDju
 function getUsernameById(PDO $conn, int $id): ?string
 {
     $user = getUserById($conn, $id);
 
     if ($user["username"]) {
         return $user["username"];
+    }
+
+    else return null;
+}
+
+function getUserPfpById(PDO $conn, int $id): ?string
+{
+    $user = getUserById($conn, $id);
+
+    if ($user["profile_image"]) {
+        return $user["profile_image"];
     }
 
     else return null;
