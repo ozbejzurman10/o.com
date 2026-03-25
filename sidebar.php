@@ -1,12 +1,15 @@
 <div class="sidenav">
     <a href="index.php" class="logo">O</a>
 
-    <a href="create_post.php">Create a post</a>
-    <a href="show_posts.php">Posts</a>
+    <div class="nav-buttons">
+        <a href="index.php">Home</a>
+        <a href="create_post.php">New Post</a>
+        <a href="show_posts.php">Posts</a>
 
-    <?php if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin"): ?>
-        <a href="admin_page.php">Admin</a>
-    <?php endif; ?>
+        <?php if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin"): ?>
+            <a href="admin_page.php">Admin Tools</a>
+        <?php endif; ?>
+    </div>
 
     <?php if (isset($_SESSION["user_id"])): ?>
         <div class="profile-div">
