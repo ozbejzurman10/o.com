@@ -227,6 +227,7 @@ body {
 
 .post-title {
     font-size: 22px;
+    text-align: center;
 }
 
 
@@ -250,7 +251,7 @@ body {
 
     cursor: pointer;
     font-size: 20px;
-    color: #ff4d4d;
+    color: #EE8355;
 }
 
 .not-liked-btn {
@@ -261,14 +262,29 @@ body {
 
     cursor: pointer;
     font-size: 20px;
-    color: black;
+    color: #FFFFFF;
+    -webkit-text-stroke: 1px black;
+
 }
 
-.post-bottom{
-    display: inline;
+.post-bottom {
+    color: #777777;
+    font-size: 14px;
+}
+
+.post-bottom-profile {
+    color: #EE8355;
+    text-decoration: none;
+    font-size: 16px;
 }
 
 .post-bottom-right{
     font-size: 20px;
-    text-align: right;
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
 }

@@ -2,6 +2,10 @@
 session_start();
 require_once "../config/db.php";
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../login.php");
+}
+
 if (isset($_POST["like_post"]) && isset($_SESSION["user_id"])) {
 
     $user_id = $_SESSION["user_id"];

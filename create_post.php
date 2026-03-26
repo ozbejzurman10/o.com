@@ -5,6 +5,10 @@ require_once "helpers/helpers.php";
 
 $error = "";
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $post_title = trim($_POST["post_title"] ?? "");
     $post_content = trim($_POST["post_content"] ?? "");

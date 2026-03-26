@@ -7,19 +7,14 @@ $error = "";
 
 if (isset($_GET['id'])) {
     $profile_user_id = intval($_GET['id']); // ID uporabnika iz URL
-}
-
-else {
+} else {
     $profile_user_id = $_SESSION['user_id']; // moj profil, če ni ID
 }
 
 if (isset($_SESSION['user_id'])) {
     $isOwnProfile = ($_SESSION['user_id'] == $profile_user_id);
-}
-
-else {
-    $isOwnProfile = false;
-    $error = "You must be logged in to do that!";
+} else {
+    header("Location: login.php");
 }
 
 $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
@@ -30,9 +25,13 @@ $stmt = $conn->prepare("SELECT COUNT(*) AS followers_count FROM follows WHERE fo
 $stmt->execute([$profile_user_id]);
 $followerData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$user) { $error = "User not found"; }
+$stmt = $conn->prepare("SELECT * FROM posts WHERE user_id = ? ORDER BY created_at DESC");
+$stmt->execute([$profile_user_id]);
+$posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-else {
+if (!$user) {
+    $error = "User not found";
+} else {
     $user_id = $user["id"];
     $username = $user["username"];
     $user_role = $user["user_role"];
@@ -80,13 +79,21 @@ if (isset($_POST['upload_image']) && isset($_FILES['profile_image'])) {
                     // refresh
                     $user['profile_image'] = $newName;
 
-                } else { $error = "Upload failed!"; }
+                } else {
+                    $error = "Upload failed!";
+                }
 
-            } else { $error = "File too large!"; }
+            } else {
+                $error = "File too large!";
+            }
 
-        } else { $error = "Upload error!"; }
+        } else {
+            $error = "Upload error!";
+        }
 
-    } else { $error = "Invalid file type!"; }
+    } else {
+        $error = "Invalid file type!";
+    }
 }
 
 // bio
@@ -99,8 +106,19 @@ if (isset($_POST['update_bio'])) {
     $user_bio = $new_bio;
 }
 
+// display name
+if (isset($_POST['update_display_name'])) {
+    $new_display_name = trim($_POST['new_display_name']);
 
-function deleteOldPfp($conn, $user_id) {
+    $stmt = $conn->prepare("UPDATE users SET display_name = ? WHERE id = ?");
+    $stmt->execute([$new_display_name, $profile_user_id]);
+
+    $display_name = $new_display_name;
+}
+
+
+function deleteOldPfp($conn, $user_id)
+{
     $stmt = $conn->prepare("SELECT profile_image FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $userPfp = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -117,75 +135,132 @@ function deleteOldPfp($conn, $user_id) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<?php 
-    include 'sidebar.php'; ?>
+    <?php include 'sidebar.php'; ?>
+
+    <div class="main">
+        <h1>Profile</h1>
+
+        <?php if ($error): ?>
+            <p style="color:red;"><?php echo $error; ?></p>
+        <?php endif; ?>
+
+        <?php if (!$error): ?>
+            <p><strong>Username:</strong> <?php echo htmlspecialchars($username); ?></p>
+            <p><strong>Display Name:</strong> <?php echo htmlspecialchars($display_name); ?></p>
+            <p><strong>User ID:</strong> <?php echo htmlspecialchars($user_id); ?></p>
+            <p><strong>User role:</strong> <?php echo htmlspecialchars($user_role); ?></p>
+            <p><strong>User Bio:</strong> <?php echo htmlspecialchars($user_bio); ?></p>
+
+            <p>Followers: <?php echo htmlspecialchars($followerData['followers_count']); ?></p>
+
+            <?php if ($isOwnProfile): ?>
+                <!-- edit bio -->
+                <form method="POST">
+                    <textarea name="new_bio" rows="4" cols="50"><?php echo htmlspecialchars($user_bio); ?></textarea>
+                    <button type="submit" name="update_bio">Update Bio</button>
+                </form>
+
+                <!-- edit display name -->
+                <form method="POST">
+                    <input type="text" name="new_display_name"><?php echo htmlspecialchars($display_name); ?></input>
+                    <button type="submit" name="update_display_name">Update Display Name</button>
+                </form>
+
+                <!-- pfp -->
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="file" name="profile_image" accept="image/*">
+                    <button type="submit" name="upload_image">Upload</button>
+                </form>
 
 
+            <?php else: ?>
+                <!-- follow -->
+                <form method="POST" action="helpers/follow_handler.php">
+                    <input type="hidden" name="profile_user_id" value="<?php echo $profile_user_id; ?>">
+                    <button type="submit" name="follow_unfollow">
+                        <?php echo isFollowing($conn, $_SESSION['user_id'], $profile_user_id) ? "Unfollow" : "Follow"; ?>
+                    </button>
+                </form>
+            <?php endif; ?>
 
-<div class="main">
-<h1>Profile</h1>
+            <?php
+            if (!empty($user['profile_image'])) {
+                $img = $user['profile_image'];
+            } else {
+                $img = 'default.png';
+            }
+            ?>
 
-<?php if ($error): ?>
-    <p style="color:red;"><?php echo $error; ?></p>
-<?php endif; ?>
+            <img class="profile-pic" src="profile_images/<?php echo htmlspecialchars($img); ?>" alt="Avatar"
+                style="width:100px;height:100px;">
 
-<?php if (!$error): ?>
-    <p><strong>Username:</strong> <?php echo htmlspecialchars($username); ?></p>
-    <p><strong>Display Name:</strong> <?php echo htmlspecialchars($display_name); ?></p>
-    <p><strong>User ID:</strong> <?php echo htmlspecialchars($user_id); ?></p>
-    <p><strong>User role:</strong> <?php echo htmlspecialchars($user_role); ?></p>
-    <p><strong>User Bio:</strong> <?php echo htmlspecialchars($user_bio); ?></p>
+        <?php endif; ?>
 
-    <p>Followers: <?php echo htmlspecialchars($followerData['followers_count']); ?></p>
+        
+        <!-- list posts -->
+        <div class="posts-wrapper">
+            <?php foreach ($posts as $post): ?>
+                <div class="post">
+                    <div class="post-title"><?php echo htmlspecialchars($post['title']); ?></div>
 
-    <?php if ($isOwnProfile): ?>
-        <!-- edit bio -->
-        <form method="POST">
-            <textarea name="new_bio" rows="4" cols="50"><?php echo htmlspecialchars($user_bio); ?></textarea><br>
-            <button type="submit" name="update_bio">Update Bio</button>
-        </form>
+                    <div class="post-content">
+                        <?php echo nl2br(htmlspecialchars($post['content'])); ?>
+                    </div>
 
-        <!-- pfp -->
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="profile_image" accept="image/*">
-            <button type="submit" name="upload_image">Upload</button>
-        </form>
+                    <div class="post-bottom">
+                        <?php echo htmlspecialchars(getUsernameById($conn, $post['user_id'])); ?>
+
+                        <?php echo htmlspecialchars($post['created_at']); ?>
+                    </div>
+
+                    <?php if (
+                        (isset($_SESSION["user_id"]) && $_SESSION["user_id"] == $post['user_id'])
+                        ||
+                        (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin")
+                    ): ?>
+
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                            <button type="submit" name="delete_post">Delete Post</button>
+                        </form>
+
+                    <?php endif; ?>
+
+                    <div class="post-bottom-right">
+
+                        <?php echo getLikesCount($conn, $post['id']); ?>
+
+                        <?php $liked = isLiked($conn, $_SESSION['user_id'], $post['id']); ?>
+
+                        <form method="POST" action="helpers/like_handler.php" style="display:inline;">
+                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+
+                            <button type="submit" name="like_post"
+                                class="<?php echo $liked ? 'liked-btn' : 'not-liked-btn'; ?>">
+                                <?php echo "❤︎" ?>
+                            </button>
+                        </form>
 
 
-    <?php else: ?>
-        <!-- follow -->
-        <form method="POST" action="helpers/follow_handler.php">
-            <input type="hidden" name="profile_user_id" value="<?php echo $profile_user_id; ?>">
-            <button type="submit" name="follow_unfollow">
-                <?php echo isFollowing($conn, $_SESSION['user_id'], $profile_user_id) ? "Unfollow" : "Follow"; ?>
-            </button>
-        </form>
-    <?php endif; ?>
+                    </div>
 
-<?php
-if (!empty($user['profile_image'])) {
-    $img = $user['profile_image'];
-} 
-else { $img = 'default.png'; }
-?>
+                </div>
+            <?php endforeach; ?>
+        </div>
 
-<img class="profile-pic" src="profile_images/<?php echo htmlspecialchars($img); ?>" alt="Avatar" style="width:100px;height:100px;">
-
-<?php endif; ?>
-
-<p><a href="index.php">Nazaj na začetno stran</a></p>
-
-</div>
+    </div>
 
 
 
 </body>
-</html>
 
+</html>

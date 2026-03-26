@@ -30,7 +30,15 @@ if (isset($_POST['delete_post'])) {
 <body>
     <?php include 'sidebar.php'; ?>
 
+    <div class="main">
+        <div class="centered-container">
+            <div class="logo">O</div>
+            <div class="subtitle">Latest Posts</div>
+        </div>
+    </div>
+
     <div class="main-posts">
+
         <div class="posts-wrapper">
             <?php foreach ($posts as $post): ?>
                 <div class="post">
@@ -40,41 +48,40 @@ if (isset($_POST['delete_post'])) {
                         <?php echo nl2br(htmlspecialchars($post['content'])); ?>
                     </div>
 
-                    <div class="post-bottom">
-                        <?php echo htmlspecialchars(getUsernameById($conn, $post['user_id'])); ?>
+                    <div class="post-footer">
 
-                        <?php echo htmlspecialchars($post['created_at']); ?>
-                    </div>
+                        <a href="profile.php?id=<?php echo $post['user_id'] ?>" class="post-bottom-profile">
+                            <?php echo htmlspecialchars(getUsernameById($conn, $post['user_id'])); ?>
+                        </a>
 
-                    <?php if (
-                        (isset($_SESSION["user_id"]) && $_SESSION["user_id"] == $post['user_id'])
-                        ||
-                        (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin")
-                    ): ?>
+                        <div class="post-bottom">
+                            <?php echo htmlspecialchars($post['created_at']); ?>
+                        </div>
 
-                        <form method="POST" style="display:inline;">
-                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                            <button type="submit" name="delete_post">Delete Post</button>
-                        </form>
+                        <div class="post-bottom-right">
 
-                    <?php endif; ?>
+                            <?php echo getLikesCount($conn, $post['id']); ?>
 
-                    <div class="post-bottom-right">
+                            <?php
+                            if (isset($_SESSION['user_id'])):
+                                $liked = isLiked($conn, $_SESSION['user_id'], $post['id']);
+                            else:
+                                $liked = false;
+                                ?>
 
-                        <?php echo getLikesCount($conn, $post['id']); ?>
+                            <?php endif; ?>
 
-                        <?php $liked = isLiked($conn, $_SESSION['user_id'], $post['id']); ?>
 
-                        <form method="POST" action="helpers/like_handler.php" style="display:inline;">
-                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                            <form method="POST" action="helpers/like_handler.php" style="display:inline;">
+                                <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
 
-                            <button type="submit" name="like_post"
-                                class="<?php echo $liked ? 'liked-btn' : 'not-liked-btn'; ?>">
+                                <button type="submit" name="like_post"
+                                    class="<?php echo $liked ? 'liked-btn' : 'not-liked-btn'; ?>">
 
-                                <?php echo "❤︎"?>
-                            </button>
-                        </form>
-
+                                    <?php echo "❤︎" ?>
+                                </button>
+                            </form>
+                        </div>
 
                     </div>
 

@@ -42,7 +42,7 @@
             </a>
 
             <div style="margin-left: -12px;">
-                <a href="profile.php" class="profile-link">
+                <a href="login.php" class="profile-link">
                     Guest
                 </a>
                 <a class="logout-link" href="login.php">Login</a>
