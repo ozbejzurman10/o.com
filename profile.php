@@ -22,7 +22,6 @@ else {
     $error = "You must be logged in to do that!";
 }
 
-// Poizvedba za user podatke
 $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$profile_user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -100,40 +99,6 @@ if (isset($_POST['update_bio'])) {
     $user_bio = $new_bio;
 }
 
-// follow unfollow
-if (isset($_POST['follow_unfollow'])) {
-    if (!$isOwnProfile) {
-
-        if (isFollowing($conn, $_SESSION['user_id'], $profile_user_id)) {
-            // unfollow
-            $stmt = $conn->prepare("DELETE FROM follows WHERE following_user_id = ? AND followed_user_id = ?");
-            $stmt->execute([$_SESSION['user_id'], $profile_user_id]);
-        } 
-        
-        else {
-            // follow
-            $stmt = $conn->prepare("INSERT INTO follows (following_user_id, followed_user_id) VALUES (?, ?)");
-            $stmt->execute([$_SESSION['user_id'], $profile_user_id]);
-        }
-
-        // refreshaj stran
-        header("Location: profile.php?id=" . $profile_user_id);
-        exit;
-    }
-}
-
-function isFollowing($conn, $follower_id, $followed_id) {
-    $stmt = $conn->prepare("SELECT followed_user_id FROM follows WHERE following_user_id = ? AND followed_user_id = ?");
-    $stmt->execute([$follower_id, $followed_id]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($result) {
-        return true;
-    } 
-    else {
-        return false;
-    }
-}
 
 function deleteOldPfp($conn, $user_id) {
     $stmt = $conn->prepare("SELECT profile_image FROM users WHERE id = ?");
@@ -196,7 +161,8 @@ function deleteOldPfp($conn, $user_id) {
 
     <?php else: ?>
         <!-- follow -->
-        <form method="POST">
+        <form method="POST" action="helpers/follow_handler.php">
+            <input type="hidden" name="profile_user_id" value="<?php echo $profile_user_id; ?>">
             <button type="submit" name="follow_unfollow">
                 <?php echo isFollowing($conn, $_SESSION['user_id'], $profile_user_id) ? "Unfollow" : "Follow"; ?>
             </button>

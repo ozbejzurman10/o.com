@@ -197,7 +197,78 @@ body {
     text-align: center;
 }
 
-.nav-buttons a:hover{
+.nav-buttons a:hover {
     background-color: #EE8355;
     color: #ffffff;
+}
+
+.posts-wrapper {
+    width: 100%;
+    max-width: 500px;
+}
+
+.main-posts {
+    margin-left: 200px;
+    padding: 0px 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.post {
+    padding: 18px;
+
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+    border-radius: 18px;
+    font-family: 'DM Sans';
+    margin-top: 20px;
+}
+
+.post-title {
+    font-size: 22px;
+}
+
+
+.post-content {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+
+    background-color: #F9F7F5;
+    color: #000000;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+    border-radius: 18px;
+    font-size: 18px;
+}
+
+.liked-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+
+    cursor: pointer;
+    font-size: 20px;
+    color: #ff4d4d;
+}
+
+.not-liked-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+
+    cursor: pointer;
+    font-size: 20px;
+    color: black;
+}
+
+.post-bottom{
+    display: inline;
+}
+
+.post-bottom-right{
+    font-size: 20px;
+    text-align: right;
 }

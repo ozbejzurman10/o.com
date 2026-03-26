@@ -3,6 +3,7 @@
 
     <div class="nav-buttons">
         <a href="index.php">Home</a>
+        <a href="profile.php">Profile</a>
         <a href="create_post.php">New Post</a>
         <a href="show_posts.php">Posts</a>
 
