@@ -5,7 +5,7 @@
         <a href="index.php">Home</a>
         <a href="profile.php">Profile</a>
         <a href="create_post.php">New Post</a>
-        <a href="show_posts.php">Posts</a>
+        <a href="list_users.php">All Users</a>
 
         <?php if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin"): ?>
             <a href="admin_page.php">Admin Tools</a>
@@ -18,16 +18,16 @@
                 <img src="profile_images/<?php echo getUserPfpById($conn, $_SESSION["user_id"]); ?>" class="profile-pic">
             </a>
 
-            <?php $username = $_SESSION["username"];
+            <?php $sidebar_username = $_SESSION["username"];
 
-            if (strlen($username) > 9) {
-                $short_username = substr($username, 0, 7) . "...";
+            if (strlen($sidebar_username) > 9) {
+                $sidebar_short_username = substr($sidebar_username, 0, 7) . "...";
             }
             ?>
 
             <div style="margin-left: -12px;">
                 <a href="profile.php" class="profile-link">
-                    <?php echo htmlspecialchars(isset($short_username) ? $short_username : $username); ?>
+                    <?php echo htmlspecialchars(isset($sidebar_short_username) ? $sidebar_short_username : $sidebar_username); ?>
                 </a>
                 <a class="logout-link" href="logout.php">Logout</a>
             </div>

@@ -4,6 +4,7 @@ require_once "config/db.php";
 require_once "helpers/helpers.php";
 
 $error = "";
+$success = "";
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -14,15 +15,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $post_content = trim($_POST["post_content"] ?? "");
 
     if (!isset($_SESSION["user_id"])) {
-        $error = "You must be logged in to create a post.";
+        $error = "You must be logged in to create a post!";
     } else
 
         if ($post_title === "" || $post_content === "") {
-            $error = "Vnesite naslov in vsebino objave.";
+            $error = "Please fill all fields!";
         } else {
             $stmt = $conn->prepare("INSERT INTO posts (title, content, user_id, created_at) VALUES (?, ?, ?, ?)");
             $stmt->execute([$post_title, $post_content, $_SESSION["user_id"], date("Y-m-d H:i:s")]);
-
+            $success = "Post created!";
+            $post_title = "";
+            $post_content = "";
         }
 }
 ?>
@@ -33,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
-    <title>Ustvari objavo</title>
+    <title>New Post</title>
 </head>
 
 <body>
@@ -41,24 +44,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <?php include 'sidebar.php'; ?>
 
     <div class="main">
+        <div class="centered-container">
+            <div class="logo">O</div>
+            <div class="subtitle">New Post</div>
+        </div>
 
-        <h1>Ustvari objavo</h1>
+        <div class="createpost-layout">
+            <div class="createpost-card">
+                <form class="createpost-form" method="POST">
+                    <label>Title</label>
+                    <input type="text" name="post_title" maxlength="80"
+                        value="<?php echo htmlspecialchars($post_title ?? ""); ?>">
 
-        <?php if ($error): ?>
-            <p style="color:red;"><?php echo htmlspecialchars($error); ?></p>
-        <?php endif; ?>
+                    <label>Content</label>
+                    <textarea name="post_content" rows="8"
+                        maxlength="2000"><?php echo htmlspecialchars($post_content ?? ""); ?></textarea>
 
-        <form method="POST">
-            <label>Naslov:</label><br>
-            <input type="text" name="post_title"><br><br>
+                    <?php if ($error): ?>
+                        <div class="post-error"><?php echo htmlspecialchars($error); ?></div>
+                    <?php elseif ($success): ?>
+                        <div class="post-success"><?php echo htmlspecialchars($success); ?></div>
+                    <?php else: ?>
+                        <div class="post-success"><br></div>
+                    <?php endif; ?>
 
-            <label>Vsebina:</label><br>
-            <textarea name="post_content"></textarea><br><br>
-
-            <button type="submit">Ustvari objavo</button>
-        </form>
-
-        <p><a href="index.php">Nazaj na začetno stran</a></p>
+                    <button type="submit">Post</button>
+                    <a class="createpost-back" href="index.php">← Back</a>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 
