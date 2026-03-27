@@ -246,7 +246,12 @@ function deleteOldPfp($conn, $user_id)
                         <div class="post-footer">
 
                             <a href="profile.php?id=<?php echo $post['user_id'] ?>" class="post-bottom-profile">
-                                <?php echo htmlspecialchars(getUsernameById($conn, $post['user_id'])); ?>
+                                <span class="post-author">
+                                    <img class="post-author-pic"
+                                        src="profile_images/<?php echo htmlspecialchars(getUserPfpById($conn, $post['user_id']) ?: 'default.png'); ?>"
+                                        alt="Avatar">
+                                    <span><?php echo htmlspecialchars(getUsernameById($conn, $post['user_id'])); ?></span>
+                                </span>
                             </a>
 
                             <div class="post-bottom">

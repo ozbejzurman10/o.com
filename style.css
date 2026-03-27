@@ -363,6 +363,18 @@ body {
     font-size: 16px;
 }
 
+.post-author {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-author-pic {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
 .post-bottom-right{
     font-size: 20px;
 }
