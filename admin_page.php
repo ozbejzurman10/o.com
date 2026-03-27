@@ -3,10 +3,10 @@ session_start();
 require_once "config/db.php";
 require_once "helpers/helpers.php";
 
-$stmt = $conn->query("SELECT id, username, email, user_role FROM users");
+$stmt = $conn->query("SELECT id, display_name, bio, username, email, user_role FROM users");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Odstrani uporabnika
+// odstrani uporabnika
 if (isset($_POST['delete_user'])) {
     $user_id = $_POST['user_id'];
     $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
@@ -18,11 +18,13 @@ if (isset($_POST['delete_user'])) {
 if (isset($_POST['edit_user'])) {
     $user_id = $_POST['edit_user_id'];
     $new_username = $_POST['edit_username'];
+    $new_display_name = $_POST['edit_display_name'];
+    $new_bio = $_POST['edit_bio'];
     $new_userrole = $_POST['edit_userrole'];
     $new_email = $_POST['edit_email'];
 
-    $stmt = $conn->prepare("UPDATE users SET username = ?, user_role = ?, email = ? WHERE id = ?");
-    $stmt->execute([$new_username, $new_userrole, $new_email, $user_id]);
+    $stmt = $conn->prepare("UPDATE users SET username = ?, display_name = ?, bio = ? user_role = ?, email = ? WHERE id = ?");
+    $stmt->execute([$new_username, $new_display_name, $new_bio, $new_userrole, $new_email, $user_id]);
 
     if ($_SESSION["user_id"] == $user_id) {
         $_SESSION["username"] = $new_username;
@@ -30,6 +32,7 @@ if (isset($_POST['edit_user'])) {
     header("Location: admin_page.php");
     exit;
 }
+
 
 ?>
 
@@ -46,39 +49,67 @@ if (isset($_POST['edit_user'])) {
 
     <?php include 'sidebar.php'; ?>
     <div class="main">
-        <h1>Uporabniki:</h1>
 
-        <ul>
+        <table border="1" cellpadding="8" cellspacing="0">
+            <tr>
+                <th>Username</th>
+                <th>Display Name</th>
+                <th>Bio</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+
+            </tr>
+
             <?php foreach ($users as $user): ?>
-                <li>
+                <tr>
+                    <td>
+                        <input type="text" name="edit_username" value="<?php echo htmlspecialchars($user['username']); ?>"
+                            form="form_<?php echo $user['id']; ?>">
+                    </td>
 
-                    <?php echo htmlspecialchars($user['username']); ?>
-                    <form method="POST" style="display:inline;">
-                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                        <button type="submit" name="delete_user">Delete</button>
-                    </form>
+                    <td>
+                        <input type="text" name="edit_display_name"
+                            value="<?php echo htmlspecialchars($user['display_name']); ?>"
+                            form="form_<?php echo $user['id']; ?>">
+                    </td>
 
-                    <form method="POST" style="display:inline;">
-                        <input type="hidden" name="edit_user_id" value="<?php echo $user['id']; ?>">
-                        <input type="text" name="edit_username" value="<?php echo htmlspecialchars($user['username']); ?>">
-                        <select name="edit_userrole">
+                    <td>                        
+                        <textarea name="edit_bio" form="form_<?php echo $user['id']; ?>" rows="3" cols="30" ><?php echo htmlspecialchars($user['bio']); ?></textarea>
+                    </td>
+
+                    <td>
+                        <input type="text" name="edit_email" value="<?php echo htmlspecialchars($user['email']); ?>"
+                            form="form_<?php echo $user['id']; ?>">
+                    </td>
+
+
+                    <td>
+                        <select name="edit_userrole" form="form_<?php echo $user['id']; ?>">
                             <option value="user" <?php echo $user['user_role'] === 'user' ? 'selected' : ''; ?>>User</option>
                             <option value="admin" <?php echo $user['user_role'] === 'admin' ? 'selected' : ''; ?>>Admin
                             </option>
                         </select>
-                        <input type="text" name="edit_email" value="<?php echo htmlspecialchars($user['email']); ?>">
+                    </td>
 
-                        <button type="submit" name="edit_user">Submit Changes</button>
-                    </form>
+                    <td>
+                        <!-- EDIT FORM -->
+                        <form method="POST" id="form_<?php echo $user['id']; ?>" style="display:inline;">
+                            <input type="hidden" name="edit_user_id" value="<?php echo $user['id']; ?>">
+                            <button type="submit" name="edit_user">Save</button>
+                        </form>
 
-                <?php endforeach; ?>
-        </ul>
-
-
-        <a href="signup.php">Sign up!</a>
-        <a href="create_post.php">Create a post</a>
-        <a href="show_posts.php">Show posts</a>
-        <a href="index.php">Home</a>
+                        <!-- DELETE FORM -->
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                            <button type="submit" name="delete_user" onclick="return confirm('Delete user?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
     </div>
 
 </body>

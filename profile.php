@@ -171,7 +171,7 @@ function deleteOldPfp($conn, $user_id)
 
                 <!-- edit display name -->
                 <form method="POST">
-                    <input type="text" name="new_display_name"><?php echo htmlspecialchars($display_name); ?></input>
+                    <input type="text" name="new_display_name" value="<?php echo htmlspecialchars($display_name); ?>"></input>
                     <button type="submit" name="update_display_name">Update Display Name</button>
                 </form>
 
@@ -205,54 +205,67 @@ function deleteOldPfp($conn, $user_id)
 
         <?php endif; ?>
 
-        
+
         <!-- list posts -->
-        <div class="posts-wrapper">
-            <?php foreach ($posts as $post): ?>
-                <div class="post">
-                    <div class="post-title"><?php echo htmlspecialchars($post['title']); ?></div>
+        <div class="main-posts">
+            <div class="posts-wrapper">
+                <?php foreach ($posts as $post): ?>
+                    <div class="post">
+                        <div class="post-title"><?php echo htmlspecialchars($post['title']); ?></div>
 
-                    <div class="post-content">
-                        <?php echo nl2br(htmlspecialchars($post['content'])); ?>
+                        <div class="post-content">
+                            <?php echo nl2br(htmlspecialchars($post['content'])); ?>
+                        </div>
+
+                        <div class="post-footer">
+
+                            <a href="profile.php?id=<?php echo $post['user_id'] ?>" class="post-bottom-profile">
+                                <?php echo htmlspecialchars(getUsernameById($conn, $post['user_id'])); ?>
+                            </a>
+
+                            <div class="post-bottom">
+                                <?php echo htmlspecialchars($post['created_at']); ?>
+                            </div>
+
+                            <?php if (
+                                (isset($_SESSION["user_id"]) && $_SESSION["user_id"] == $post['user_id'])
+                                ||
+                                (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin")
+                            ): ?>
+
+                                <form method="POST" style="display:inline;">
+                                    <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+                                    <button type="submit" name="delete_post">Delete Post</button>
+                                </form>
+
+                            <?php endif; ?>
+
+                            <div class="post-bottom-right">
+
+                                <?php echo getLikesCount($conn, $post['id']); ?>
+
+                                <?php
+                                if (isset($_SESSION['user_id'])):
+                                    $liked = isLiked($conn, $_SESSION['user_id'], $post['id']);
+                                else:
+                                    $liked = false;
+                                    ?>
+
+                                <?php endif; ?>
+
+
+                                <form method="POST" action="helpers/like_handler.php" style="display:inline;">
+                                    <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
+
+                                    <button type="submit" name="like_post"
+                                        class="<?php echo $liked ? 'liked-btn' : 'not-liked-btn'; ?>">
+
+                                        <?php echo "❤︎" ?>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="post-bottom">
-                        <?php echo htmlspecialchars(getUsernameById($conn, $post['user_id'])); ?>
-
-                        <?php echo htmlspecialchars($post['created_at']); ?>
-                    </div>
-
-                    <?php if (
-                        (isset($_SESSION["user_id"]) && $_SESSION["user_id"] == $post['user_id'])
-                        ||
-                        (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin")
-                    ): ?>
-
-                        <form method="POST" style="display:inline;">
-                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                            <button type="submit" name="delete_post">Delete Post</button>
-                        </form>
-
-                    <?php endif; ?>
-
-                    <div class="post-bottom-right">
-
-                        <?php echo getLikesCount($conn, $post['id']); ?>
-
-                        <?php $liked = isLiked($conn, $_SESSION['user_id'], $post['id']); ?>
-
-                        <form method="POST" action="helpers/like_handler.php" style="display:inline;">
-                            <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-
-                            <button type="submit" name="like_post"
-                                class="<?php echo $liked ? 'liked-btn' : 'not-liked-btn'; ?>">
-                                <?php echo "❤︎" ?>
-                            </button>
-                        </form>
-
-
-                    </div>
-
                 </div>
             <?php endforeach; ?>
         </div>
