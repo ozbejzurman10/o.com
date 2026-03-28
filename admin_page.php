@@ -58,7 +58,7 @@ if (isset($_POST['visit_user'])) {
     <div class="main">
         <div class="centered-container">
             <div class="logo">O</div>
-            <div class="subtitle">Admin panel</div>
+            <div class="subtitle">Admin Panel</div>
         </div>
 
         <div class="admin-layout">

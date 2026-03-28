@@ -2,6 +2,10 @@
 require_once "config/db.php";
 
 $error = "";
+$username = "";
+$display_name = "";
+$email = "";
+$password = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -11,30 +15,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST["password"];
 
     if (empty($username) || empty($email) || empty($password)) {
-        $error = "Izpolnite vsa polja!";
+        $error = "Please fill in all fields!";
     }
 
+
     elseif (strlen($display_name) > 32) {
-    $error = "Display name lahko vsebuje največ 32 znakov!";
+    $error = "Display name can contain a maximum of 32 characters!";;
     }
 
     elseif (strlen($username) > 16) {
-    $error = "Username lahko vsebuje največ 16 znakov!";
+    $error = "Username can contain a maximum of 16 characters!";
     }
 
     elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-    $error = "Username lahko vsebuje samo črke, številke in _";
+    $error = "Username can only contain letters, numbers, and underscores!";
     }
     
     else {
-        // Preveri če uporabnik že obstaja
-        $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
-        $check->execute([$email]);
+        // preveri ce uporabnik ze obstaja
+        $checkEmail = $conn->prepare("SELECT id FROM users WHERE email = ?");
+        $checkEmail->execute([$email]);
 
-        if ($check->rowCount() > 0) {
-            $error = "Uporabnik s tem emailom že obstaja.";
-        } 
-        
+        $checkUsername = $conn->prepare("SELECT id FROM users WHERE username = ?");
+        $checkUsername->execute([$username]);
+
+        // preveri mail
+        if ($checkEmail->rowCount() > 0) {
+            $error = "A user with this email already exists!";
+        }
+
+        // preveri username
+        else if ($checkUsername->rowCount() > 0) {
+                $error = "Username is already taken!";
+        }
+
         else {
             // Hash gesla
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -49,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if ($stmt->execute([$username, $display_name, $email, $hashedPassword])) {
                 header("Location: login.php");
             } else {
-                $error = "Napaka pri registraciji.";
+                $error = "Registration failed. Please try again.";
             }
         }
     }
@@ -74,13 +88,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <div class="centered-container">
 <form class="login_form" method="POST">
     <label>Email</label>
-    <input type="email" name="email">
+    <input type="email" name="email" value="<?php echo $email; ?>">
     
     <label>Username</label>
-    <input type="text" name="username" maxlength="16">
+    <input type="text" name="username" maxlength="16" value="<?php echo $username; ?>">
 
     <label>Display Name</label>
-    <input type="text" name="display_name" maxlength="32">
+    <input type="text" name="display_name" maxlength="32" value="<?php echo $display_name; ?>">
 
     <label>Password</label>
     <input type="password" name="password">

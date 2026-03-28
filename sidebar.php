@@ -5,10 +5,9 @@
         <a href="index.php">Home</a>
         <a href="profile.php">Profile</a>
         <a href="create_post.php">New Post</a>
-        <a href="list_users.php">All Users</a>
 
         <?php if (isset($_SESSION["user_role"]) && $_SESSION["user_role"] === "admin"): ?>
-            <a href="admin_page.php">Admin Tools</a>
+            <a href="admin_page.php">Admin Panel</a>
         <?php endif; ?>
     </div>
 
