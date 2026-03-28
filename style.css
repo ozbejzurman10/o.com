@@ -313,6 +313,9 @@ body {
 .post-title {
     font-size: 22px;
     text-align: center;
+    overflow-wrap: break-word;
+    word-break: normal;
+
 }
 
 
@@ -326,6 +329,10 @@ body {
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     border-radius: 18px;
     font-size: 18px;
+
+    overflow-wrap: break-word;
+    word-break: normal;
+
 }
 
 .liked-btn {
@@ -540,6 +547,100 @@ body {
     display: flex;
     justify-content: center;
     margin-top: -18px;
+}
+
+.admin-layout {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+}
+
+.admin-card {
+    width: 100%;
+    max-width: 1200px;
+    padding: 18px;
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+    border-radius: 18px;
+}
+
+.admin-table {
+    width: 100%;
+    font-family: 'DM Sans';
+}
+
+.admin-table th {
+    text-align: left;
+    font-size: 14px;
+    color: #777777;
+    padding: 10px ;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.admin-table td {
+    padding: 10px;
+}
+
+.admin-inline-form {
+    display: inline-flex;
+    margin-right: 8px;
+}
+
+.admin-input,
+.admin-textarea,
+.admin-select {
+    padding: 10px 12px;
+    background-color: #F9F7F5;
+    border-radius: 18px;
+    border: none;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+    outline: none;
+    color: #000000;
+    font-family: 'DM Sans';
+    font-size: 14px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.admin-textarea {
+    resize: vertical;
+    min-height: 54px;
+}
+
+.admin-save-btn {
+    padding: 10px 14px;
+    background-color: #F9F7F5;
+    color: #000000;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+    border-radius: 18px;
+    border: none;
+    font-family: 'DM Sans';
+    font-size: 14px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.admin-delete-btn {
+    padding: 10px 14px;
+    background-color: #F9F7F5;
+    color: red;
+    border-radius: 18px;
+    border: none;
+    font-family: 'DM Sans';
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.18);
+}
+
+.admin-save-btn:hover {
+    background-color: #EE8355;
+    color: #ffffff;
+}
+
+.admin-delete-btn:hover {
+    background-color: red;
+    color: #ffffff;
 }
 
 .post-error {

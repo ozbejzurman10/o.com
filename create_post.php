@@ -20,6 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($post_title === "" || $post_content === "") {
             $error = "Please fill all fields!";
+        } else if ((mb_strlen($post_title) > 64) || (mb_strlen($post_content) > 2000)) {
+            $error = "Title or content too long!";
         } else {
             $stmt = $conn->prepare("INSERT INTO posts (title, content, user_id, created_at) VALUES (?, ?, ?, ?)");
             $stmt->execute([$post_title, $post_content, $_SESSION["user_id"], date("Y-m-d H:i:s")]);
@@ -53,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="createpost-card">
                 <form class="createpost-form" method="POST">
                     <label>Title</label>
-                    <input type="text" name="post_title" maxlength="80"
+                    <input type="text" name="post_title" maxlength="64"
                         value="<?php echo htmlspecialchars($post_title ?? ""); ?>">
 
                     <label>Content</label>

@@ -23,13 +23,20 @@ if (isset($_POST['edit_user'])) {
     $new_userrole = $_POST['edit_userrole'];
     $new_email = $_POST['edit_email'];
 
-    $stmt = $conn->prepare("UPDATE users SET username = ?, display_name = ?, bio = ? user_role = ?, email = ? WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE users SET username = ?, display_name = ?, bio = ?, user_role = ?, email = ? WHERE id = ?");
     $stmt->execute([$new_username, $new_display_name, $new_bio, $new_userrole, $new_email, $user_id]);
 
     if ($_SESSION["user_id"] == $user_id) {
         $_SESSION["username"] = $new_username;
     }
     header("Location: admin_page.php");
+    exit;
+}
+
+if (isset($_POST['visit_user'])) {
+    $visit_user_id = $_POST['visit_user_id'];
+
+    header("Location: profile.php?id=$visit_user_id");
     exit;
 }
 
@@ -49,67 +56,80 @@ if (isset($_POST['edit_user'])) {
 
     <?php include 'sidebar.php'; ?>
     <div class="main">
+        <div class="centered-container">
+            <div class="logo">O</div>
+            <div class="subtitle">Admin panel</div>
+        </div>
 
-        <table border="1" cellpadding="8" cellspacing="0">
-            <tr>
-                <th>Username</th>
-                <th>Display Name</th>
-                <th>Bio</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
+        <div class="admin-layout">
+            <div class="admin-card">
+                <table class="admin-table">
+                    <tr>
+                        <th>Username</th>
+                        <th>Display Name</th>
+                        <th>Bio</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
 
-            </tr>
+                    <?php foreach ($users as $user): ?>
+                        <tr>
+                            <td>
+                                <input class="admin-input" type="text" name="edit_username"
+                                    value="<?php echo htmlspecialchars($user['username']); ?>"
+                                    form="form_<?php echo $user['id']; ?>">
+                            </td>
 
-            <?php foreach ($users as $user): ?>
-                <tr>
-                    <td>
-                        <input type="text" name="edit_username" value="<?php echo htmlspecialchars($user['username']); ?>"
-                            form="form_<?php echo $user['id']; ?>">
-                    </td>
+                            <td>
+                                <input class="admin-input" type="text" name="edit_display_name"
+                                    value="<?php echo htmlspecialchars($user['display_name']); ?>"
+                                    form="form_<?php echo $user['id']; ?>">
+                            </td>
 
-                    <td>
-                        <input type="text" name="edit_display_name"
-                            value="<?php echo htmlspecialchars($user['display_name']); ?>"
-                            form="form_<?php echo $user['id']; ?>">
-                    </td>
+                            <td>
+                                <textarea class="admin-textarea" name="edit_bio" form="form_<?php echo $user['id']; ?>"
+                                    rows="3"><?php echo htmlspecialchars($user['bio']); ?></textarea>
+                            </td>
 
-                    <td>                        
-                        <textarea name="edit_bio" form="form_<?php echo $user['id']; ?>" rows="3" cols="30" ><?php echo htmlspecialchars($user['bio']); ?></textarea>
-                    </td>
+                            <td>
+                                <input class="admin-input" type="text" name="edit_email"
+                                    value="<?php echo htmlspecialchars($user['email']); ?>"
+                                    form="form_<?php echo $user['id']; ?>">
+                            </td>
 
-                    <td>
-                        <input type="text" name="edit_email" value="<?php echo htmlspecialchars($user['email']); ?>"
-                            form="form_<?php echo $user['id']; ?>">
-                    </td>
+                            <td>
+                                <select class="admin-select" name="edit_userrole"
+                                    form="form_<?php echo $user['id']; ?>">
+                                    <option value="user" <?php echo $user['user_role'] === 'user' ? 'selected' : ''; ?>>User</option>
+                                    <option value="admin" <?php echo $user['user_role'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                </select>
+                            </td>
 
+                            <td>
+                                <form method="POST" id="form_<?php echo $user['id']; ?>" class="admin-inline-form">
+                                    <input type="hidden" name="edit_user_id" value="<?php echo $user['id']; ?>">
+                                    <button class="admin-save-btn" type="submit" name="edit_user">Save</button>
+                                </form>
 
-                    <td>
-                        <select name="edit_userrole" form="form_<?php echo $user['id']; ?>">
-                            <option value="user" <?php echo $user['user_role'] === 'user' ? 'selected' : ''; ?>>User</option>
-                            <option value="admin" <?php echo $user['user_role'] === 'admin' ? 'selected' : ''; ?>>Admin
-                            </option>
-                        </select>
-                    </td>
+                                <form method="POST" id="form_<?php echo $user['id']; ?>" class="admin-inline-form">
+                                    <input type="hidden" name="visit_user_id" value="<?php echo $user['id']; ?>">
+                                    <button class="admin-save-btn" type="submit" name="visit_user">Profile</button>
+                                </form>
 
-                    <td>
-                        <!-- EDIT FORM -->
-                        <form method="POST" id="form_<?php echo $user['id']; ?>" style="display:inline;">
-                            <input type="hidden" name="edit_user_id" value="<?php echo $user['id']; ?>">
-                            <button type="submit" name="edit_user">Save</button>
-                        </form>
-
-                        <!-- DELETE FORM -->
-                        <form method="POST" style="display:inline;">
-                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                            <button type="submit" name="delete_user" onclick="return confirm('Delete user?')">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </table>
+                                <form method="POST" class="admin-inline-form">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                    <button class="admin-delete-btn" type="submit" name="delete_user"
+                                        onclick="return confirm('Delete user?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        </div>
     </div>
 
 </body>

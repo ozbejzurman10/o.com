@@ -109,6 +109,15 @@ if (!$error && $isOwnProfile && isset($_POST['save_profile'])) {
     }
 }
 
+// izbrisi post
+if (isset($_POST['delete_post'])) {
+    $post_id = $_POST['post_id'];
+    $stmt = $conn->prepare("DELETE FROM posts WHERE id = ?");
+    $stmt->execute([$post_id]);
+    header("Location: profile.php?id=$profile_user_id");
+    exit;
+}
+
 
 function deleteOldPfp($conn, $user_id)
 {
