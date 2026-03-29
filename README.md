@@ -10,7 +10,7 @@ Mini socialno omrežje - projektna naloga pri predmetu SPA in UPP.
 
 1. Kloniraj repozitorij v mapo `htdocs` v XAMPP-u:
    ```
-   C:\xampp\htdocs\spa_projektna
+   C:\xampp\htdocs\IME_MAPE
    ```
 
 2. Odpri **phpMyAdmin** (`http://localhost/phpmyadmin`) in ustvari novo bazo.
