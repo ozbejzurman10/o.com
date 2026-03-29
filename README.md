@@ -13,13 +13,11 @@ Mini socialno omrežje - projektna naloga pri predmetu SPA in UPP.
    C:\xampp\htdocs\IME_MAPE
    ```
 
-2. Odpri **phpMyAdmin** (`http://localhost/phpmyadmin`) in ustvari novo bazo.
+2. Odpri **phpMyAdmin** (`http://localhost/phpmyadmin`) in uvozi datoteko `o_com_sql_skripta.sql`. Ustvarila se bo podatkovna baza `o_com`.
 
-3. Uvozi datoteko `o_com_sql_skripta.sql` v ustvarjeno bazo.
+3. Zaženi Apache in MySQL v XAMPP Control Panel.
 
-4. Zaženi Apache in MySQL v XAMPP Control Panel.
-
-5. Odpri brskalnik in pojdi na:
+4. Odpri brskalnik in pojdi na:
    ```
    http://localhost/IME_MAPE
    ```
