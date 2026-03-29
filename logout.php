@@ -1,12 +1,11 @@
 <?php
 session_start();
 
-// Odstrani vse podatke iz seje
+// odstrani vse podatke
 $_SESSION = [];
 
-// Uniči sejo
+// unici sejo
 session_destroy();
 
-// Preusmeri nazaj na index
 header("Location: index.php");
 exit;
